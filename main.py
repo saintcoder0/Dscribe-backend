@@ -38,16 +38,20 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(title="Patient Admission Management API", lifespan=lifespan)
 
 raw_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173")
-cors_origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+cors_origins = [
+    origin.strip().strip('"').strip("'").rstrip("/")
+    for origin in raw_origins.split(",")
+    if origin.strip()
+]
 if not cors_origins:
     cors_origins = ["http://localhost:5173"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin=raw_origins,
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["content-type", ""],
+    allow_headers=["*"],
 )
 
 
